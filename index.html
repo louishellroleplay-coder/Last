@@ -1,0 +1,1012 @@
+<!--
+LPP SAARBRÜCKEN SECURENET V5
+NEUER KOMPLETTCODE
+
+LOGIN:
+admin
+0717
+-->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LPP SecureNet V5</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0b1117;
+color:white;
+}
+
+.login{
+width:350px;
+margin:120px auto;
+background:#151d27;
+padding:30px;
+border-radius:14px;
+}
+
+input,button,select,textarea{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+box-sizing:border-box;
+}
+
+input,select,textarea{
+background:#222d39;
+color:white;
+}
+
+button{
+background:#0d6efd;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.layout{
+display:none;
+}
+
+.sidebar{
+position:fixed;
+left:0;
+top:0;
+width:250px;
+height:100vh;
+background:#111820;
+padding:20px;
+border-right:2px solid #0d6efd;
+}
+
+.logo{
+font-size:26px;
+font-weight:bold;
+text-align:center;
+margin-bottom:30px;
+color:#0d6efd;
+}
+
+.menu button{
+margin-top:10px;
+background:#1e2733;
+}
+
+.content{
+margin-left:270px;
+padding:25px;
+}
+
+.page{
+display:none;
+}
+
+.active{
+display:block;
+}
+
+.card{
+background:#151d27;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+}
+
+.file{
+background:#1e2733;
+padding:15px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.result{
+background:#0f151d;
+padding:20px;
+border-radius:10px;
+text-align:center;
+font-size:22px;
+margin-top:20px;
+color:#00ff88;
+font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login" id="loginBox">
+
+<h1 style="text-align:center;color:#0d6efd;">
+LPP SecureNet
+</h1>
+
+<input type="text" id="username" placeholder="Benutzername">
+
+<input type="password" id="password" placeholder="Passwort">
+
+<button onclick="login()">
+Anmelden
+</button>
+
+</div>
+
+<div class="layout" id="layout">
+
+<div class="sidebar">
+
+<div class="logo">
+LPP NET
+</div>
+
+<div class="menu">
+
+<button onclick="showPage('dashboard')">
+Dashboard
+</button>
+
+<button onclick="showPage('akte')">
+Neue Akte
+</button>
+
+<button onclick="showPage('schrank')">
+Aktenschrank
+</button>
+
+<button onclick="showPage('personen')">
+Personen
+</button>
+
+<button onclick="showPage('fahrzeuge')">
+Fahrzeuge
+</button>
+
+<button onclick="showPage('logs')">
+Protokolle
+</button>
+
+<button id="adminBtn"
+style="display:none;"
+onclick="showPage('admin')">
+
+Administration
+
+</button>
+
+<button onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<div class="content">
+
+<div class="page active" id="dashboard">
+
+<div class="card">
+
+<h2>Dashboard</h2>
+
+<div id="stats"></div>
+
+</div>
+
+</div>
+
+<div class="page" id="akte">
+
+<div class="card">
+
+<h2>Neue Ermittlungsakte</h2>
+
+<select id="rolle">
+
+<option value="kripo">
+Kripo
+</option>
+
+<option value="schutzpolizei">
+Schutzpolizei
+</option>
+
+<option value="autoposer">
+Autoposer
+</option>
+
+<option value="interneermittlung">
+Interne Ermittlung
+</option>
+
+</select>
+
+<select id="gesetz">
+
+<option>STGB</option>
+<option>STPO</option>
+<option>BTMG</option>
+<option>OWIG</option>
+<option>WAFFG</option>
+<option>BKAG</option>
+<option>DSGVO</option>
+
+</select>
+
+<input type="text"
+id="paragraph"
+placeholder="Paragraph">
+
+<input type="text"
+id="titel"
+placeholder="Akten Titel">
+
+<button onclick="createAkte()">
+Akte erstellen
+</button>
+
+<div class="result" id="result">
+Keine Akte erstellt
+</div>
+
+<button onclick="copyAZ()">
+Aktenzeichen kopieren
+</button>
+
+</div>
+
+</div>
+
+<div class="page" id="schrank">
+
+<div class="card">
+
+<h2>Aktenschrank</h2>
+
+<input type="text"
+id="searchAZ"
+placeholder="Aktenzeichen">
+
+<button onclick="openByAZ()">
+Akte öffnen
+</button>
+
+</div>
+
+<div class="card"
+id="akteBox"
+style="display:none;">
+
+<h2 id="akteTitle"></h2>
+
+<select id="statusSelect">
+
+<option>Offen</option>
+<option>Observation</option>
+<option>Zugriff</option>
+<option>Archiviert</option>
+<option>Geschlossen</option>
+
+</select>
+
+<textarea id="akteText"
+placeholder="Ermittlungsnotizen">
+</textarea>
+
+<input type="file"
+id="akteFiles"
+multiple
+accept="image/*,.pdf">
+
+<button onclick="saveAkte()">
+Akte speichern
+</button>
+
+<div id="fileList"></div>
+
+</div>
+
+</div>
+
+<div class="page" id="personen">
+
+<div class="card">
+
+<h2>Personenakte</h2>
+
+<input type="text"
+id="personName"
+placeholder="Name">
+
+<input type="text"
+id="personBirth"
+placeholder="Geburtsdatum">
+
+<textarea id="personInfo"
+placeholder="Informationen">
+</textarea>
+
+<button onclick="addPerson()">
+Speichern
+</button>
+
+<div id="personList"></div>
+
+</div>
+
+</div>
+
+<div class="page" id="fahrzeuge">
+
+<div class="card">
+
+<h2>Fahrzeugakte</h2>
+
+<input type="text"
+id="plate"
+placeholder="Kennzeichen">
+
+<input type="text"
+id="owner"
+placeholder="Halter">
+
+<textarea id="vehicleInfo"
+placeholder="Informationen">
+</textarea>
+
+<button onclick="addVehicle()">
+Speichern
+</button>
+
+<div id="vehicleList"></div>
+
+</div>
+
+</div>
+
+<div class="page" id="logs">
+
+<div class="card">
+
+<h2>Systemprotokolle</h2>
+
+<div id="logList"></div>
+
+</div>
+
+</div>
+
+<div class="page" id="admin">
+
+<div class="card">
+
+<h2>Benutzer erstellen</h2>
+
+<input type="text"
+id="newUser"
+placeholder="Benutzername">
+
+<input type="password"
+id="newPass"
+placeholder="Passwort">
+
+<select id="newRole">
+
+<option>kripo</option>
+<option>schutzpolizei</option>
+<option>autoposer</option>
+<option>interneermittlung</option>
+
+</select>
+
+<button onclick="createUser()">
+Benutzer erstellen
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Benutzer</h2>
+
+<div id="userList"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* SYSTEM */
+
+localStorage.removeItem("users");
+
+let users = {
+
+admin:{
+password:"0717",
+role:"admin",
+permissions:[
+"kripo",
+"schutzpolizei",
+"autoposer",
+"interneermittlung"
+]
+}
+
+};
+
+if(!localStorage.getItem("users")){
+
+localStorage.setItem(
+"users",
+JSON.stringify(users)
+);
+
+}
+
+users =
+JSON.parse(localStorage.getItem("users"));
+
+let akten =
+JSON.parse(localStorage.getItem("akten"))
+|| {};
+
+let logs =
+JSON.parse(localStorage.getItem("logs"))
+|| [];
+
+let persons =
+JSON.parse(localStorage.getItem("persons"))
+|| [];
+
+let vehicles =
+JSON.parse(localStorage.getItem("vehicles"))
+|| [];
+
+let currentUser="";
+let currentRole="";
+let currentAkte="";
+
+/* SAVE */
+
+function saveData(){
+
+localStorage.setItem(
+"users",
+JSON.stringify(users)
+);
+
+localStorage.setItem(
+"akten",
+JSON.stringify(akten)
+);
+
+localStorage.setItem(
+"logs",
+JSON.stringify(logs)
+);
+
+localStorage.setItem(
+"persons",
+JSON.stringify(persons)
+);
+
+localStorage.setItem(
+"vehicles",
+JSON.stringify(vehicles)
+);
+
+}
+
+/* LOGIN */
+
+function login(){
+
+let user =
+document.getElementById("username").value;
+
+let pass =
+document.getElementById("password").value;
+
+if(
+users[user] &&
+users[user].password === pass
+){
+
+currentUser=user;
+currentRole=users[user].role;
+
+document.getElementById("loginBox")
+.style.display="none";
+
+document.getElementById("layout")
+.style.display="block";
+
+if(currentRole==="admin"){
+
+document.getElementById("adminBtn")
+.style.display="block";
+
+}
+
+addLog("Login");
+
+loadStats();
+loadLogs();
+loadUsers();
+loadPersons();
+loadVehicles();
+
+}else{
+
+alert("Ungültige Daten");
+
+}
+
+}
+
+/* LOGOUT */
+
+function logout(){
+
+location.reload();
+
+}
+
+/* NAVIGATION */
+
+function showPage(page){
+
+document.querySelectorAll(".page")
+.forEach(p=>{
+
+p.classList.remove("active");
+
+});
+
+document.getElementById(page)
+.classList.add("active");
+
+}
+
+/* LOGS */
+
+function addLog(text){
+
+logs.push({
+
+user:currentUser,
+text:text,
+time:new Date().toLocaleString()
+
+});
+
+saveData();
+
+}
+
+/* AKTE */
+
+function createAkte(){
+
+let gesetz =
+document.getElementById("gesetz").value;
+
+let paragraph =
+document.getElementById("paragraph").value;
+
+let titel =
+document.getElementById("titel").value;
+
+let rolle =
+document.getElementById("rolle").value;
+
+let year =
+new Date().getFullYear()
+.toString()
+.slice(-2);
+
+let random =
+Math.floor(Math.random()*999999)
+.toString()
+.padStart(6,'0');
+
+let az =
+`LP-SBR-${gesetz}-${paragraph}-${year}-${random}`;
+
+akten[az]={
+
+titel:titel,
+rolle:rolle,
+status:"Offen",
+notiz:"",
+files:[],
+bearbeiter:currentUser
+
+};
+
+saveData();
+
+document.getElementById("result")
+.innerHTML=az;
+
+addLog("Akte erstellt "+az);
+
+loadStats();
+
+}
+
+/* COPY */
+
+function copyAZ(){
+
+navigator.clipboard.writeText(
+document.getElementById("result")
+.innerText
+);
+
+alert("Kopiert");
+
+}
+
+/* OPEN */
+
+function openByAZ(){
+
+let az =
+document.getElementById("searchAZ")
+.value;
+
+if(!akten[az]){
+
+alert("Nicht gefunden");
+return;
+
+}
+
+openAkte(az);
+
+}
+
+function openAkte(az){
+
+currentAkte=az;
+
+let akte=akten[az];
+
+document.getElementById("akteBox")
+.style.display="block";
+
+document.getElementById("akteTitle")
+.innerHTML=az;
+
+document.getElementById("akteText")
+.value=akte.notiz;
+
+document.getElementById("statusSelect")
+.value=akte.status;
+
+renderFiles();
+
+}
+
+/* SAVE AKTE */
+
+function saveAkte(){
+
+let akte=akten[currentAkte];
+
+akte.notiz =
+document.getElementById("akteText")
+.value;
+
+akte.status =
+document.getElementById("statusSelect")
+.value;
+
+let files =
+document.getElementById("akteFiles")
+.files;
+
+for(let file of files){
+
+let reader =
+new FileReader();
+
+reader.onload=function(e){
+
+akte.files.push({
+
+name:file.name,
+data:e.target.result
+
+});
+
+saveData();
+renderFiles();
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+saveData();
+
+addLog("Akte gespeichert");
+
+}
+
+/* FILES */
+
+function renderFiles(){
+
+let akte=akten[currentAkte];
+
+let box=
+document.getElementById("fileList");
+
+box.innerHTML="";
+
+akte.files.forEach((file,index)=>{
+
+box.innerHTML += `
+
+<div class="file">
+
+📁 ${file.name}
+
+<br><br>
+
+<button onclick="openFile(${index})">
+Öffnen
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+function openFile(index){
+
+window.open(
+akten[currentAkte]
+.files[index]
+.data
+);
+
+}
+
+/* PERSONEN */
+
+function addPerson(){
+
+persons.push({
+
+name:
+document.getElementById("personName")
+.value,
+
+birth:
+document.getElementById("personBirth")
+.value,
+
+info:
+document.getElementById("personInfo")
+.value
+
+});
+
+saveData();
+loadPersons();
+
+}
+
+function loadPersons(){
+
+let box=
+document.getElementById("personList");
+
+box.innerHTML="";
+
+persons.forEach(p=>{
+
+box.innerHTML += `
+
+<div class="file">
+
+<b>${p.name}</b><br>
+
+${p.birth}<br><br>
+
+${p.info}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* FAHRZEUGE */
+
+function addVehicle(){
+
+vehicles.push({
+
+plate:
+document.getElementById("plate")
+.value,
+
+owner:
+document.getElementById("owner")
+.value,
+
+info:
+document.getElementById("vehicleInfo")
+.value
+
+});
+
+saveData();
+loadVehicles();
+
+}
+
+function loadVehicles(){
+
+let box=
+document.getElementById("vehicleList");
+
+box.innerHTML="";
+
+vehicles.forEach(v=>{
+
+box.innerHTML += `
+
+<div class="file">
+
+<b>${v.plate}</b><br>
+
+${v.owner}<br><br>
+
+${v.info}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* USERS */
+
+function createUser(){
+
+if(currentRole!=="admin") return;
+
+let user =
+document.getElementById("newUser")
+.value;
+
+let pass =
+document.getElementById("newPass")
+.value;
+
+let role =
+document.getElementById("newRole")
+.value;
+
+users[user]={
+
+password:pass,
+role:role,
+permissions:[]
+
+};
+
+saveData();
+loadUsers();
+
+}
+
+function loadUsers(){
+
+let box=
+document.getElementById("userList");
+
+box.innerHTML="";
+
+for(let user in users){
+
+box.innerHTML += `
+
+<div class="file">
+
+<b>${user}</b><br>
+
+${users[user].role}
+
+</div>
+
+`;
+
+}
+
+}
+
+/* LOGS */
+
+function loadLogs(){
+
+let box=
+document.getElementById("logList");
+
+box.innerHTML="";
+
+logs.forEach(log=>{
+
+box.innerHTML += `
+
+<div class="file">
+
+<b>${log.user}</b><br>
+
+${log.text}<br><br>
+
+${log.time}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* STATS */
+
+function loadStats(){
+
+document.getElementById("stats")
+.innerHTML = `
+
+<div class="file">
+Akten: ${Object.keys(akten).length}
+</div>
+
+<div class="file">
+Benutzer: ${Object.keys(users).length}
+</div>
+
+<div class="file">
+Logs: ${logs.length}
+</div>
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>
